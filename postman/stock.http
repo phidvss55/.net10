@@ -1,0 +1,40 @@
+@API_HOST = http://localhost:8080/api/stocks
+
+### Get all stocks
+GET {{API_HOST}}/ HTTP/1.1
+Accept: application/json
+
+###
+GET {{API_HOST}}/2 HTTP/1.1
+Accept: application/json
+
+###
+POST {{API_HOST}}/
+Content-Type: application/json
+
+{
+  "id": 1,
+  "Symbol": "UTH",
+  "CompanyName": "UTH Limited" ,
+  "Price": 12.53,
+  "LastDiv":  0.5,
+  "Industry": "IT",
+  "MarketCap":  0
+}
+
+###
+DELETE {{API_HOST}}/3
+
+###
+PUT {{API_HOST}}/3
+Content-Type: application/json
+
+{
+  "id": 1,
+  "Symbol": "UEH",
+  "CompanyName": "UEH Updating" ,
+  "Price": 12.53,
+  "LastDiv":  10.25,
+  "Industry": "IT",
+  "MarketCap":  1220
+}

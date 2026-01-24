@@ -1,0 +1,37 @@
+@API_HOST = http://localhost:8080
+
+### Get all pizzas
+GET {{API_HOST}}/pizza/ HTTP/1.1
+Accept: application/json
+
+###
+GET {{API_HOST}}/pizza/1 HTTP/1.1
+Accept: application/json
+
+###
+GET {{API_HOST}}/pizza/5
+Accept: application/json
+
+###
+POST {{API_HOST}}/pizza/
+Content-Type: application/json
+
+{
+  "name": "Hawaii",
+  "isGlutenFree": false
+}
+
+###
+DELETE {{API_HOST}}/pizza/3
+
+###
+PUT {{API_HOST}}/pizza/3
+Content-Type: application/json
+
+{
+  "id": 3,
+  "name": "Hawaiian updating",
+  "isGlutenFree": false
+}
+
+###
