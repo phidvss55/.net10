@@ -5,8 +5,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using webapi.Contracts;
 using webapi.Data;
+using webapi.Middleware;
 using webapi.Models;
 using webapi.Repository;
+using webapi.Routes;
 using webapi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +19,8 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddValidation();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -100,13 +104,12 @@ if (app.Environment.IsDevelopment())
 }
 
 // app.UseRewriter(new RewriteOptions().AddRedirect("history", "about"));
-// app.MapGet("/", () => "Hello World!");
+app.MapGet("/", () => "Hello World!");
 // app.MapGet("/welcome", (IPersonService personService) => personService.GetWelcomeMessage());
 // app.MapGet("/persons", (IPersonService personService) =>
 // {
 //     return $"Hello, {personService.GetPersonName()}!";
 // });
-
 
 app.UseRouting();
 // app.UsePathBase("/api");
@@ -115,6 +118,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 // app.UseAntiforgery(); // csrf
 app.MapControllers();
+
+app.MapGameRoutes();
 
 // app.Use(async (context, next) =>
 // {
@@ -136,6 +141,8 @@ app.MapControllers();
 //     Console.WriteLine($"{context.Request.Method} {context.Request.Path} {context.Response.StatusCode}");
 //     await next(); 
 // });
+
+app.UseMiddleware<LoggerMiddleware>();
 
 string hostUrl = builder.Configuration["AppSettings:HostUrl"] ?? "http://localhost:8001";
 app.Run(hostUrl);

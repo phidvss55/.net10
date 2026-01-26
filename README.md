@@ -13,6 +13,14 @@
     - [project name].Tests.csproj - Test project file
     - UnitTests.cs - Unit tests file
 
+--- 
+### Run project
+
+```bash
+dotnet restore
+dotnet build
+dotnet run
+```
 ---
 ### Commands
 

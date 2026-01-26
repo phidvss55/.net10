@@ -7,7 +7,7 @@ Accept: application/json
 GET {{API_HOST}}/
 Accept: application/json
 
-### About page
+### Welcome
 GET {{API_HOST}}/welcome
 Accept: application/json
 

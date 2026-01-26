@@ -1,0 +1,37 @@
+@API_HOST = http://localhost:8080/games
+
+### 
+GET {{API_HOST}}/ HTTP/1.1
+Accept: application/json
+
+###
+GET {{API_HOST}}/1 HTTP/1.1
+Accept: application/json
+
+###
+POST {{API_HOST}}/
+Content-Type: application/json
+
+{
+  "Name": "Freendom Game",
+  "Genre": "Adventure",
+  "Price": 29.99,
+  "ReleaseDate": "2023-11-15"
+}
+
+###
+DELETE {{API_HOST}}/3
+
+###
+PUT {{API_HOST}}/3
+Content-Type: application/json
+
+{
+  "id": 1,
+  "Symbol": "UEH",
+  "CompanyName": "UEH Updating" ,
+  "Price": 12.53,
+  "LastDiv":  10.25,
+  "Industry": "IT",
+  "MarketCap":  1220
+}

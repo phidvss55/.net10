@@ -7,15 +7,14 @@ namespace webapi.Data;
 
 public class ApplicationDBContext: IdentityDbContext<AppUser>
 {
-    public ApplicationDBContext(DbContextOptions dbContext) : base(dbContext)
-    {
-        
-    }      
+    public ApplicationDBContext(DbContextOptions dbContext) : base(dbContext) {}
     
     public DbSet<Stock> Stocks { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<WeatherForecast> WeatherForecasts { get; set; }
     public DbSet<Portfolio> Portfolios { get; set; }
+    public DbSet<Game> Games => Set<Game>();
+    public DbSet<Genre> Genres => Set<Genre>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -24,6 +23,7 @@ public class ApplicationDBContext: IdentityDbContext<AppUser>
         builder.Entity<Portfolio>().HasOne(u => u.AppUser).WithMany(u => u.Portfolios).HasForeignKey(u => u.AppUserId);
         builder.Entity<Portfolio>().HasOne(u => u.Stock).WithMany(u => u.Portfolios).HasForeignKey(u => u.StockId);
             
+        // seeding for roles
         List<IdentityRole> roles = new List<IdentityRole>
         {
             new IdentityRole
@@ -43,5 +43,14 @@ public class ApplicationDBContext: IdentityDbContext<AppUser>
         };
          
         builder.Entity<IdentityRole>().HasData(roles);
+
+        // seeding for genres
+        List<Genre> genres = new List<Genre>
+        {
+            new Genre { Id = 1, Name = "Action" },
+            new Genre { Id = 2, Name = "Adventure" },
+            new Genre { Id = 3, Name = "RPG" },
+        };
+        builder.Entity<Genre>().HasData(genres);
     }
 }
