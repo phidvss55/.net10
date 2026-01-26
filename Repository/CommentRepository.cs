@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using webapi.Commons;
 using webapi.Contracts;
 using webapi.Data;
 using webapi.Models;
@@ -14,17 +15,28 @@ public class CommentRepository: ICommentRepository
         _context = context;
     }
     
-    public async Task<List<Models.Comment>> GetAllAsync()
+    public async Task<List<Comment>> GetAllAsync(CommentQueryObject queryObject)
     {
-        return await  _context.Comments.ToListAsync();
+        var comments = _context.Comments.Include(a => a.AppUser).AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(queryObject.Symbol))
+        {
+            comments = comments.Where(s => s.Stock.Symbol == queryObject.Symbol);
+        };
+        if (queryObject.IsDecsending == true)
+        {
+            comments = comments.OrderByDescending(c => c.CreatedAt);
+        }
+        return await comments.ToListAsync();
     }
+
     
-    public async Task<Models.Comment?> GetByIdAsync(int id)
+    public async Task<Comment?> GetByIdAsync(int id)
     {
         return await _context.Comments.FirstOrDefaultAsync(c => c.Id == id);
     }
     
-    public async Task<Models.Comment> CreateAsync(Models.Comment commentModel)
+    public async Task<Comment> CreateAsync(Comment commentModel)
     {
         await _context.Comments.AddAsync(commentModel);
         await _context.SaveChangesAsync();

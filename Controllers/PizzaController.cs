@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using webapi.Models;
 using webapi.Services;
@@ -6,6 +7,7 @@ namespace webapi.Controllers;
 
 [ApiController]
 [Route("/pizzas")]
+[Authorize]
 public class PizzaController: BaseApiController
 {
     [HttpGet(Name = "GetAllPizzas")]

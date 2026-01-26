@@ -12,4 +12,7 @@ public class Comment
     // navigation property 
     public Stock? Stock { get; set; }
     
+    public AppUser AppUser { get; set; }
+
+
 }

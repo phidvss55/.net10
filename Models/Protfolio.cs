@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace webapi.Models;
 
-[Table("Portfolios")]
+[Table("portfolios")]
 public class Portfolio
 {
     public string AppUserId { get; set; }

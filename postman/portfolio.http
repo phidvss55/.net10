@@ -1,0 +1,32 @@
+@API_HOST = http://localhost:8080/portfolios
+@TOKEN = eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBoaUBnbWFpbC5jb20iLCJnaXZlbl9uYW1lIjoidGVzdHVzZXIiLCJuYmYiOjE3Njk0MDU1OTgsImV4cCI6MTc3MDAxMDM5OCwiaWF0IjoxNzY5NDA1NTk4LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwODAifQ.lx8LQS2-fYyadXer1K9w3frmDkeK9lUvvIHCkoKLIblmpnxMACYCzZeuC8FKehS5a7NLPmaxCCQyZYekysOL5A
+
+### Get all
+GET {{API_HOST}}/ HTTP/1.1
+Accept: application/json
+Authentication: Bearer {{TOKEN}}
+
+###
+GET {{API_HOST}}/2 HTTP/1.1
+Accept: application/json
+
+###
+POST {{API_HOST}}/1
+Content-Type: application/json
+
+{ 
+  "symbol": "First Comment"
+}
+
+###
+DELETE {{API_HOST}}/3
+Content-Type: application/json
+
+###
+PUT {{API_HOST}}/123
+Content-Type: application/json
+
+{
+  "title": "Updatinggggggggggggg",
+  "content": "This is the content of the first comment."
+}

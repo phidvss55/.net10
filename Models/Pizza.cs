@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace webapi.Models;
 
+[Table("pizzas")]
 public class Pizza
 {
     public int Id { get; set; }
