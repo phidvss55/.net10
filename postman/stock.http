@@ -1,11 +1,11 @@
-@API_HOST = http://localhost:8080/api/stocks
+@API_HOST = http://localhost:8080/stocks
 
 ### Get all stocks
 GET {{API_HOST}}/ HTTP/1.1
 Accept: application/json
 
 ###
-GET {{API_HOST}}/2 HTTP/1.1
+GET {{API_HOST}}/1 HTTP/1.1
 Accept: application/json
 
 ###

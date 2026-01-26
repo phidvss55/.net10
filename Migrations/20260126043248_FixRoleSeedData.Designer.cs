@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using webapi.Data;
 
@@ -11,9 +12,11 @@ using webapi.Data;
 namespace webapi.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260126043248_FixRoleSeedData")]
+    partial class FixRoleSeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,14 +55,14 @@ namespace webapi.Migrations
                         new
                         {
                             Id = "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-                            ConcurrencyStamp = "1",
+                            ConcurrencyStamp = "db483d24-7f46-45fc-9beb-fc545399e3c0",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-                            ConcurrencyStamp = "2",
+                            ConcurrencyStamp = "014cfc82-5ee4-45b6-8a2d-6c37be125686",
                             Name = "User",
                             NormalizedName = "USER"
                         });

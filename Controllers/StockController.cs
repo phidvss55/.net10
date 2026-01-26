@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using webapi.Commons;
+using webapi.Contracts;
 using webapi.Data;
 using webapi.Dtos.Stock;
 using webapi.Mapper;
@@ -11,17 +13,20 @@ namespace webapi.Controllers;
 public class StockController : BaseApiController
 {
     private readonly ApplicationDBContext _context;
+    private readonly IStockRepository _stockRepository;
 
-    public StockController(ApplicationDBContext context)
+    public StockController(ApplicationDBContext context, IStockRepository stockRepository)
     {
         _context = context;
+        _stockRepository = stockRepository;
     }
 
     [HttpGet("")]
-    public async Task<IActionResult> GetStocks()
+    public async Task<IActionResult> GetStocks([FromQuery] QueryObject query)
     {
-        // var stocks = _context.Stocks.ToList().Select(s => s.ToStockDto());
-        var stocks = await _context.Stocks.ToListAsync(); // this is when you use with async/await  J
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var stocks = await _stockRepository.GetAllAsync(query);
         var stockDtos = stocks.Select(s => s.ToStockDto());
         return Ok(stockDtos);
     }

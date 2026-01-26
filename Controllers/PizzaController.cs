@@ -5,8 +5,8 @@ using webapi.Services;
 namespace webapi.Controllers;
 
 [ApiController]
-[Route("[controller]")]
-public class PizzaController: ControllerBase
+[Route("/pizzas")]
+public class PizzaController: BaseApiController
 {
     [HttpGet(Name = "GetAllPizzas")]
     public IEnumerable<Models.Pizza> GetAll()
@@ -14,7 +14,7 @@ public class PizzaController: ControllerBase
         return Services.PizzaService.GetAll();
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public Models.Pizza? Get(int id)
     {
         return Services.PizzaService.Get(id);
@@ -27,7 +27,7 @@ public class PizzaController: ControllerBase
         return CreatedAtAction(nameof(Get), new { id = pizza.Id }, pizza);
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     public IActionResult Put(int id, Pizza pizza)
     {
         if (id != pizza.Id)

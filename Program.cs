@@ -1,9 +1,12 @@
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Rewrite;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using webapi.Contracts;
 using webapi.Data;
+using webapi.Models;
+using webapi.Repository;
 using webapi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,21 +18,66 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo {
+        Title = "PizzaStore API",
+        Description = "Making the Pizzas you love",
+        Version = "v1" 
+    });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter a valid token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",   
+        Scheme =  "bearer",
+    });
+});
+
 // add DBContext here later
 builder.Services.AddDbContext<ApplicationDBContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddSingleton<IPersonService, PersonService>();
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 6;
+}).AddEntityFrameworkStores<ApplicationDBContext>();
 
-// builder.Services.AddSwaggerGen(c =>
-// {
-//     c.SwaggerDoc("v1", new OpenApiInfo {
-//         Title = "PizzaStore API",
-//         Description = "Making the Pizzas you love",
-//         Version = "v1" });
-// });
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = options.DefaultChallengeScheme = options.DefaultForbidScheme = options.DefaultScheme = options.DefaultSignInScheme = options
+        .DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme; 
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+        ValidateAudience = true,
+        ValidAudience =  builder.Configuration["JwtSettings:Audience"],
+        ValidateIssuerSigningKey =  true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"])
+        ),
+    };
+});
+
+builder.Services.AddSingleton<IPersonService, PersonService>();
+builder.Services.AddScoped<IStockRepository, StockRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 
 var app = builder.Build();
 
@@ -57,14 +105,11 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseRouting();
-app.UsePathBase("/api");
-
+// app.UsePathBase("/api");
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 // app.UseAntiforgery(); // csrf
-
 app.MapControllers();
 
 // app.Use(async (context, next) =>
@@ -81,12 +126,12 @@ app.MapControllers();
 // {
 //     await context.Response.WriteAsync("Hello from middleware 2!\r\n");
 // });
-
+//
 // app.Use(async (context, next) =>
 // {
 //     Console.WriteLine($"{context.Request.Method} {context.Request.Path} {context.Response.StatusCode}");
 //     await next(); 
 // });
 
-app.Run();
-// app.Run("http://localhost:2000");
+string hostUrl = builder.Configuration["AppSettings:HostUrl"] ?? "http://localhost:8001";
+app.Run(hostUrl);

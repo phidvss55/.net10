@@ -1,3 +1,5 @@
+using webapi.Dtos.Comment;
+
 namespace webapi.Dtos.Stock;
 
 public class StockDto
@@ -11,4 +13,5 @@ public class StockDto
     public long MarketCap { get; set; }
     
     // Comments are excluded in the DTO for simplicity
+    public List<CommentDto> Comments { get; set; } = new List<CommentDto>();
 }
