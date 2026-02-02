@@ -1,0 +1,144 @@
+@page "/"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>Dashboard</PageTitle>
+
+<div class="card">
+    <h1>🍕 Welcome to PizzaStore Dashboard</h1>
+    <p>This is a <strong>Blazor Component</strong> (.razor) integrated into your Web API project. It uses C# for both the UI and the logic!</p>
+    
+    <div class="action-area">
+        <button @onclick="FetchGreeting" class="btn" disabled="@isLoading">
+            @if (isLoading)
+            {
+                <span>Calling...</span>
+            }
+            else
+            {
+                <span>Fetch API Greeting</span>
+            }
+        </button>
+        <div class="result-box">
+            @if (string.IsNullOrEmpty(greeting))
+            {
+                <span class="placeholder">Result will appear here...</span>
+            }
+            else if (hasError)
+            {
+                <span style="color: #ff4757">Error: @greeting</span>
+            }
+            else
+            {
+                <span class="success">@greeting</span>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        background: white;
+        padding: 3rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        max-width: 800px;
+        margin: 2rem auto;
+        text-align: center;
+    }
+    h1 {
+        margin-top: 0;
+        color: var(--secondary);
+    }
+    p {
+        color: #747d8c;
+        line-height: 1.6;
+        font-size: 1.1rem;
+    }
+    .action-area {
+        margin-top: 3rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    .btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: transform 0.2s, background 0.3s;
+        box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+    }
+    .btn:hover:not(:disabled) {
+        background: #ff6b81;
+        transform: translateY(-2px);
+    }
+    .btn:active:not(:disabled) {
+        transform: translateY(0);
+    }
+    .btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    .result-box {
+        width: 100%;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border: 1px dashed #dfe4ea;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        color: var(--secondary);
+    }
+    .placeholder {
+        color: #a4b0be;
+        font-style: italic;
+    }
+    .success {
+        color: #2ed573;
+    }
+</style>
+
+@code {
+    private string? greeting;
+    private bool isLoading;
+    private bool hasError;
+
+    private async Task FetchGreeting()
+    {
+        isLoading = true;
+        hasError = false;
+        greeting = null;
+
+        try
+        {
+            // Note: In a real app, you'd use a typed client or the absolute URL.
+            // Since this is the same project, we can call the API directly if configured,
+            // but for demonstration we'll simulate the fetch.
+            var response = await Http.GetFromJsonAsync<GreetingResponse>($"{Navigation.BaseUri}api/SampleApi/hello");
+            greeting = response?.Message;
+        }
+        catch (Exception ex)
+        {
+            hasError = true;
+            greeting = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    public class GreetingResponse
+    {
+        public string? Message { get; set; }
+    }
+}

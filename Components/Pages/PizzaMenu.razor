@@ -1,0 +1,158 @@
+@page "/pizza"
+@using webapi.Models
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>Pizzas</PageTitle>
+
+<div class="card">
+    <h1>🍕 Our Pizza Menu</h1>
+    <p>Fetched directly from the Pizza Controller using Blazor's HttpClient.</p>
+
+    @if (pizzas == null)
+    {
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading the secret recipes...</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-container">
+            <table class="pizza-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Gluten Free</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pizza in pizzas)
+                    {
+                        <tr>
+                            <td>@pizza.Id</td>
+                            <td>@pizza.Name</td>
+                            <td>
+                                @if (pizza.IsGlutenFree)
+                                {
+                                    <span class="badge badge-success">Yes</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-danger">No</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<style>
+    .card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        max-width: 900px;
+        margin: 1rem auto;
+        text-align: center;
+    }
+    h1 { margin-top: 0; color: var(--secondary); }
+    p { color: #747d8c; margin-bottom: 2rem; }
+
+    .table-container {
+        overflow-x: auto;
+        border-radius: 10px;
+        border: 1px solid #dfe4ea;
+    }
+
+    .pizza-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .pizza-table th {
+        background-color: #f8f9fa;
+        color: var(--secondary);
+        padding: 1rem;
+        border-bottom: 2px solid #dfe4ea;
+        font-weight: 600;
+    }
+
+    .pizza-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #dfe4ea;
+        color: #2f3542;
+    }
+
+    .pizza-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .pizza-table tr:hover {
+        background-color: #f1f2f6;
+    }
+
+    .badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .badge-success {
+        background-color: #e3fcef;
+        color: #00875a;
+    }
+
+    .badge-danger {
+        background-color: #ffebe6;
+        color: #de350b;
+    }
+
+    .loading {
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border-left-color: var(--primary);
+        animation: spin 1s linear infinite;
+        margin-bottom: 1rem;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+@code {
+    private List<Pizza>? pizzas;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Fetch from the root-relative /pizzas endpoint
+            pizzas = await Http.GetFromJsonAsync<List<Pizza>>($"{Navigation.BaseUri}pizzas");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching pizzas: {ex.Message}");
+            pizzas = new List<Pizza>(); // Fallback to empty list
+        }
+    }
+}

@@ -11,6 +11,7 @@ namespace webapi.Controllers;
 public class PizzaController: BaseApiController
 {
     [HttpGet(Name = "GetAllPizzas")]
+    [AllowAnonymous]
     public IEnumerable<Models.Pizza> GetAll()
     {
         return Services.PizzaService.GetAll();

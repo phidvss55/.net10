@@ -1,0 +1,66 @@
+@inherits LayoutComponentBase
+
+<header>
+    <a href="/">PizzaStore</a>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/pizza">Pizzas</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    @Body
+</main>
+
+<footer>
+    <p>&copy; @DateTime.Now.Year - PizzaStore API & Blazor</p>
+</footer>
+
+<style>
+    header {
+        background-color: var(--secondary);
+        color: white;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    header a {
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.5rem;
+    }
+    nav ul {
+        list-style: none;
+        display: flex;
+        gap: 2rem;
+        margin: 0;
+        padding: 0;
+    }
+    nav a {
+        color: #ced4da;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    nav a:hover {
+        color: var(--primary);
+    }
+    main {
+        flex: 1;
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+    }
+    footer {
+        background-color: var(--secondary);
+        color: #a4b0be;
+        text-align: center;
+        padding: 1.5rem;
+        margin-top: auto;
+    }
+</style>

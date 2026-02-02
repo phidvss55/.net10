@@ -13,8 +13,15 @@ using webapi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// append razor
+// append razor
+builder.Services.AddRazorPages();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddHttpClient();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddOpenApi();
@@ -103,22 +110,23 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// app.UseRewriter(new RewriteOptions().AddRedirect("history", "about"));
-app.MapGet("/", () => "Hello World!");
-// app.MapGet("/welcome", (IPersonService personService) => personService.GetWelcomeMessage());
-// app.MapGet("/persons", (IPersonService personService) =>
-// {
-//     return $"Hello, {personService.GetPersonName()}!";
-// });
+// razor here
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.UseRouting();
-// app.UsePathBase("/api");
-app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
-// app.UseAntiforgery(); // csrf
-app.MapControllers();
+app.UseAntiforgery();
 
+app.UseMiddleware<LoggerMiddleware>();
+
+app.MapRazorPages();
+app.MapRazorComponents<webapi.Components.App>()
+    .AddInteractiveServerRenderMode();
+
+app.MapControllers();
 app.MapGameRoutes();
 
 // app.Use(async (context, next) =>
@@ -142,7 +150,7 @@ app.MapGameRoutes();
 //     await next(); 
 // });
 
-app.UseMiddleware<LoggerMiddleware>();
+
 
 string hostUrl = builder.Configuration["AppSettings:HostUrl"] ?? "http://localhost:8001";
 app.Run(hostUrl);
