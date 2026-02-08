@@ -1,32 +1,42 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using webapi.Contracts;
 using webapi.Models;
-using webapi.Services;
 
 namespace webapi.Controllers;
 
 [ApiController]
 [Route("/pizzas")]
 [Authorize]
-public class PizzaController: BaseApiController
+public class PizzaController : BaseApiController
 {
+    private readonly IPizzaService _pizzaService;
+
+    public PizzaController(IPizzaService pizzaService)
+    {
+        _pizzaService = pizzaService;
+    }
+
     [HttpGet(Name = "GetAllPizzas")]
     [AllowAnonymous]
-    public IEnumerable<Models.Pizza> GetAll()
+    public IActionResult GetAll()
     {
-        return Services.PizzaService.GetAll();
+        return Ok(_pizzaService.GetAll());
     }
 
     [HttpGet("{id:int}")]
-    public Models.Pizza? Get(int id)
+    public IActionResult Get(int id)
     {
-        return Services.PizzaService.Get(id);
+        var pizza = _pizzaService.Get(id);
+        if (pizza == null) return NotFound();
+        return Ok(pizza);
     }
 
     [HttpPost]
-    public IActionResult Post([FromBody] Models.Pizza pizza)
+    [AllowAnonymous]
+    public IActionResult Post([FromBody] Pizza pizza)
     {
-        Services.PizzaService.Add(pizza);
+        _pizzaService.Add(pizza);
         return CreatedAtAction(nameof(Get), new { id = pizza.Id }, pizza);
     }
 
@@ -36,11 +46,11 @@ public class PizzaController: BaseApiController
         if (id != pizza.Id)
             return BadRequest();
            
-        var existingPizza = PizzaService.Get(id);
+        var existingPizza = _pizzaService.Get(id);
         if(existingPizza is null)
             return NotFound();
    
-        PizzaService.Update(pizza);           
+        _pizzaService.Update(pizza);           
    
         return NoContent();
     }
@@ -48,12 +58,12 @@ public class PizzaController: BaseApiController
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
-        var pizza = PizzaService.Get(id);
+        var pizza = _pizzaService.Get(id);
    
         if (pizza is null)
             return NotFound();
        
-        PizzaService.Delete(id);
+        _pizzaService.Delete(id);
    
         return NoContent();
     }

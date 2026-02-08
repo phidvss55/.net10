@@ -4,6 +4,6 @@ namespace webapi.Contracts
 {
     public interface IFMPService
     {
-        Task<Stock> FindStockBySymbolAsync(string symbol);
+        Task<Stock?> FindStockBySymbolAsync(string symbol);
     }
 }

@@ -5,9 +5,9 @@ namespace webapi.Contracts;
 
 public interface ICommentRepository
 {
-    Task<List<Comment>> GetAllAsync(CommentQueryObject queryObject);
-    Task<Comment?> GetByIdAsync(int id);
-    Task<Comment> CreateAsync(Comment commentModel);
-    Task<Comment?> UpdateAsync(int id, Comment commentModel);
-    Task<Comment?> DeleteAsync(int id);
+    Task<Result<List<Comment>>> GetAllAsync(CommentQueryObject queryObject, CancellationToken ct = default);
+    Task<Result<Comment>> GetByIdAsync(int id, CancellationToken ct = default);
+    Task<Result<Comment>> CreateAsync(Comment commentModel, CancellationToken ct = default);
+    Task<Result<Comment>> UpdateAsync(int id, Comment commentModel, CancellationToken ct = default);
+    Task<Result<Comment>> DeleteAsync(int id, CancellationToken ct = default);
 }

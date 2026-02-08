@@ -25,35 +25,47 @@ public class PortfolioController:BaseApiController
     }
     
     [HttpGet]
-    public async Task<IActionResult> GetUserPortfolio()
+    public async Task<IActionResult> GetUserPortfolio(CancellationToken ct)
     {
         var username = User.GetUsername();
         var appUser = await _userManager.FindByNameAsync(username);
-        var userPortfolio = await _portfolioRepo.GetUserPortfolio(appUser);
-        return Ok(userPortfolio);
+        if (appUser == null) return Unauthorized();
+
+        var result = await _portfolioRepo.GetUserPortfolio(appUser, ct);
+        if (result.IsFailure) return BadRequest(result.Error);
+        
+        return Ok(result.Value);
     }
     
     [HttpPost]
-    public async Task<IActionResult> AddPortfolio(string symbol)
+    public async Task<IActionResult> AddPortfolio(string symbol, CancellationToken ct)
     {
         var username = User.GetUsername();
         var appUser = await _userManager.FindByNameAsync(username);
-        var stock = await _stockRepository.GetBySymbolAsync(symbol);
-    
-        if (stock == null) {
+        if (appUser == null) return Unauthorized();
+
+        var stockResult = await _stockRepository.GetBySymbolAsync(symbol, ct);
+        Stock stock;
+
+        if (stockResult.IsFailure) {
             stock = await _fmpService.FindStockBySymbolAsync(symbol);
             if (stock == null) {
                 return BadRequest("Stock does not exists");
             } else {
-                await _stockRepository.CreateAsync(stock);
+                var createResult = await _stockRepository.CreateAsync(stock, ct);
+                if (createResult.IsFailure) return BadRequest(createResult.Error);
+                stock = createResult.Value;
             }
         }
+        else
+        {
+            stock = stockResult.Value;
+        }
     
-        if (stock == null) return BadRequest("Stock not found");
+        var userPortfolioResult = await _portfolioRepo.GetUserPortfolio(appUser, ct);
+        if (userPortfolioResult.IsFailure) return BadRequest(userPortfolioResult.Error);
     
-        var userPortfolio = await _portfolioRepo.GetUserPortfolio(appUser);
-    
-        if (userPortfolio.Any(e => e.Symbol.ToLower() == symbol.ToLower())) return BadRequest("Cannot add same stock to portfolio");
+        if (userPortfolioResult.Value.Any(e => e.Symbol.ToLower() == symbol.ToLower())) return BadRequest("Cannot add same stock to portfolio");
     
         var portfolioModel = new Portfolio
         {
@@ -61,26 +73,28 @@ public class PortfolioController:BaseApiController
             AppUserId = appUser.Id
         };
     
-        await _portfolioRepo.CreateAsync(portfolioModel);
+        var createResultPortfolio = await _portfolioRepo.CreateAsync(portfolioModel, ct);
+        if (createResultPortfolio.IsFailure) return BadRequest(createResultPortfolio.Error);
     
-        if (portfolioModel == null) {
-            return StatusCode(500, "Could not create");
-        } else {
-            return Created();
-        }
+        return Created();
     }
     
     [HttpDelete]
-    public async Task<IActionResult> DeletePortfolio(string symbol)
+    public async Task<IActionResult> DeletePortfolio(string symbol, CancellationToken ct)
     {
         var username = User.GetUsername();
         var appUser = await _userManager.FindByNameAsync(username);
-        var userPortfolio = await _portfolioRepo.GetUserPortfolio(appUser);
-        var filteredStock = userPortfolio.Where(s => s.Symbol.ToLower() == symbol.ToLower()).ToList();
+        if (appUser == null) return Unauthorized();
+
+        var userPortfolioResult = await _portfolioRepo.GetUserPortfolio(appUser, ct);
+        if (userPortfolioResult.IsFailure) return BadRequest(userPortfolioResult.Error);
+
+        var filteredStock = userPortfolioResult.Value.Where(s => s.Symbol.ToLower() == symbol.ToLower()).ToList();
     
-        if (filteredStock.Count() == 1)
+        if (filteredStock.Count == 1)
         {
-            await _portfolioRepo.DeletePortfolio(appUser, symbol);
+            var deleteResult = await _portfolioRepo.DeletePortfolio(appUser, symbol, ct);
+            if (deleteResult.IsFailure) return NotFound(deleteResult.Error);
         }
         else
         {

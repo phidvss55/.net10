@@ -12,80 +12,67 @@ namespace webapi.Controllers;
 [Route("/stocks")]
 public class StockController : BaseApiController
 {
-    private readonly ApplicationDBContext _context;
     private readonly IStockRepository _stockRepository;
 
-    public StockController(ApplicationDBContext context, IStockRepository stockRepository)
+    public StockController(IStockRepository stockRepository)
     {
-        _context = context;
         _stockRepository = stockRepository;
     }
 
     [HttpGet("")]
-    public async Task<IActionResult> GetStocks([FromQuery] QueryObject query)
+    public async Task<IActionResult> GetStocks([FromQuery] QueryObject query, CancellationToken ct)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var stocks = await _stockRepository.GetAllAsync(query);
-        var stockDtos = stocks.Select(s => s.ToStockDto());
+        var result = await _stockRepository.GetAllAsync(query, ct);
+        if (result.IsFailure) return BadRequest(result.Error);
+
+        var stockDtos = result.Value.Select(s => s.ToStockDto());
         return Ok(stockDtos);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetStock(int id)
+    public async Task<IActionResult> GetStock([FromRoute] int id, CancellationToken ct)
     {
-        var stock = await _context.Stocks.FindAsync(id);
-        if (stock == null)
-        {
-            return NotFound();
-        }
+        if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        return Ok(stock.ToStockDto());
+        var result = await _stockRepository.GetByIdAsync(id, ct);
+        if (result.IsFailure) return NotFound(result.Error);
+
+        return Ok(result.Value.ToStockDto());
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateStock([FromBody] CreateStockRequest stockRequest)
+    public async Task<IActionResult> CreateStock([FromBody] CreateStockRequest stockRequest, CancellationToken ct)
     {
-        var stock = stockRequest.ToStockFromRequest();
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var stockModel = stockRequest.ToStockFromRequest();
+        var result = await _stockRepository.CreateAsync(stockModel, ct);
+        if (result.IsFailure) return BadRequest(result.Error);
         
-        await _context.Stocks.AddAsync(stock);
-        await _context.SaveChangesAsync();
-        
-        return CreatedAtAction(nameof(GetStock), new { id = stock .Id }, stock);
+        return CreatedAtAction(nameof(GetStock), new { id = result.Value.Id }, result.Value.ToStockDto());
     }
 
-    [HttpPut]
-    [Route("{id}")]
-    public IActionResult UpdateStock([FromRoute] int id, [FromBody] UpdateStockRequest stockRequest)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateStock([FromRoute] int id, [FromBody] UpdateStockRequest stockRequest, CancellationToken ct)
     {
-        
-        var stock = _context.Stocks.FirstOrDefault(s => s.Id == id);
-        if (stock == null)
-        {
-            return NotFound();
-        }
+        if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        stock.CompanyName = stockRequest.CompanyName;
-        stock.Price = stockRequest.Price;
+        var result = await _stockRepository.UpdateAsync(id, stockRequest, ct);
+        if (result.IsFailure) return NotFound(result.Error);
 
-        _context.SaveChanges();
-     
-        return Ok(stock.ToStockDto());
+        return Ok(result.Value.ToStockDto());
     }
 
-    [HttpDelete]
-    [Route("{id}")]
-    public IActionResult DeleteStock([FromRoute] int id)
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteStock([FromRoute] int id, CancellationToken ct)
     {
-        var stock = _context.Stocks.FirstOrDefault(s => s.Id == id);
-        if (stock == null)
-        {
-            return NotFound();
-        }
+        if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        _context.Stocks.Remove(stock);
-        _context.SaveChanges();
+        var result = await _stockRepository.DeleteAsync(id, ct);
+        if (result.IsFailure) return NotFound(result.Error);
 
-        return Ok();
+        return NoContent();
     }
 }

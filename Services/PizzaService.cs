@@ -1,41 +1,35 @@
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+using webapi.Contracts;
 using webapi.Models;
 
 namespace webapi.Services;
 
-public class PizzaService
+public class PizzaService : IPizzaService
 {
-    static List<Pizza> Pizzas { get; }
-
-    static PizzaService()
+    private static readonly List<Pizza> Pizzas = new List<Pizza>
     {
-        Pizzas = new List<Pizza>
-        {
-            new Pizza() { Id = 1, Name = "Margherita", IsGlutenFree = true },
-            new Pizza() { Id = 2, Name = "Pepperoni", IsGlutenFree = false }
-        };
-    }
+        new Pizza() { Id = 1, Name = "Margherita", IsGlutenFree = true },
+        new Pizza() { Id = 2, Name = "Pepperoni", IsGlutenFree = false }
+    };
     
-    public static List<Pizza> GetAll() => Pizzas;
-    public static Pizza? Get(int id) => Pizzas.FirstOrDefault(p => p.Id == id);
+    public List<Pizza> GetAll() => Pizzas;
+    public Pizza? Get(int id) => Pizzas.FirstOrDefault(p => p.Id == id);
     
-    public static void Add(Pizza pizza) 
+    public void Add(Pizza pizza) 
     {
         pizza.Id = Pizzas.Count + 1;
         Pizzas.Add(pizza);
     }
 
-    public static void Delete(int id)
+    public void Delete(int id)
     {
-        Pizza pizza = Get(id);
+        Pizza? pizza = Get(id);
         if (pizza is null)
             return;
         
         Pizzas.Remove(pizza);
     }
 
-    public static void Update(Pizza pizza)
+    public void Update(Pizza pizza)
     {
         var index = Pizzas.FindIndex(p => p.Id == pizza.Id);
         if (index >= 0)

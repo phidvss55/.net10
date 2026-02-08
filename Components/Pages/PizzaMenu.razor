@@ -8,12 +8,43 @@
 <div class="card">
     <h1>🍕 Our Pizza Menu</h1>
     <p>Fetched directly from the Pizza Controller using Blazor's HttpClient.</p>
+    <p>@PageName</p>
+
+    <div class="add-pizza-form">
+        <h2>🧑‍🍳 Add New Pizza</h2>
+        <div class="form-row">
+            <input type="text" @bind="newPizzaName" placeholder="Pizza name..." class="form-input" />
+            <label class="checkbox-container">
+                <input type="checkbox" @bind="isGlutenFree" />
+                <span>Gluten Free?</span>
+            </label>
+            <button class="btn btn-success" @onclick="AddPizza" disabled="@isAdding">
+                @if (isAdding) { <span>Adding...</span> } else { <span>Add Pizza</span> }
+            </button>
+        </div>
+        @if (!string.IsNullOrEmpty(statusMessage))
+        {
+            <p class="status-message @(statusMessage.Contains("Error") ? "error" : "success")">@statusMessage</p>
+        }
+    </div>
+
+    <div class="search-box">
+        <input type="text" @bind="searchTerm" @bind:event="oninput" placeholder="Search for your favorite pizza..." class="search-input" />
+        <button class="btn btn-primary" @onclick="HandleSearch">🔍 Search</button>
+    </div>
 
     @if (pizzas == null)
     {
         <div class="loading">
             <div class="spinner"></div>
             <p>Loading the secret recipes...</p>
+        </div>
+    }
+    else if (!filteredPizzas.Any())
+    {
+        <div class="no-results">
+            <p>No pizzas found matching "@searchTerm"</p>
+            <button class="btn btn-secondary" @onclick="ResetSearch">Clear Search</button>
         </div>
     }
     else
@@ -28,7 +59,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var pizza in pizzas)
+                    @foreach (var pizza in PaginatedPizzas)
                     {
                         <tr>
                             <td>@pizza.Id</td>
@@ -48,6 +79,19 @@
                 </tbody>
             </table>
         </div>
+
+        @if (TotalPages > 1)
+        {
+            <div class="pagination-controls">
+                <button class="btn btn-secondary" @onclick="PreviousPage" disabled="@(CurrentPage == 1)">
+                    Previous
+                </button>
+                <span class="page-info">Page @CurrentPage of @TotalPages</span>
+                <button class="btn btn-secondary" @onclick="NextPage" disabled="@(CurrentPage == TotalPages)">
+                    Next
+                </button>
+            </div>
+        }
     }
 </div>
 
@@ -62,7 +106,133 @@
         text-align: center;
     }
     h1 { margin-top: 0; color: var(--secondary); }
-    p { color: #747d8c; margin-bottom: 2rem; }
+    p { color: #747d8c; margin-bottom: 1rem; }
+
+    .search-box {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        justify-content: center;
+        border-top: 1px solid #dfe4ea;
+        padding-top: 2rem;
+    }
+
+    .add-pizza-form {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border: 1px solid #dfe4ea;
+    }
+
+    .add-pizza-form h2 {
+        margin-top: 0;
+        font-size: 1.2rem;
+        color: var(--secondary);
+        margin-bottom: 1rem;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .form-input {
+        padding: 0.7rem 1rem;
+        border: 1px solid #dfe4ea;
+        border-radius: 8px;
+        font-family: inherit;
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        color: #747d8c;
+    }
+
+    .btn-success {
+        background-color: #00875a;
+        color: white;
+    }
+
+    .status-message {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .status-message.success { color: #00875a; }
+    .status-message.error { color: #de350b; }
+
+    .search-input {
+        flex: 1;
+        max-width: 400px;
+        padding: 0.8rem 1.2rem;
+        border: 2px solid #dfe4ea;
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .btn {
+        padding: 0.8rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: transform 0.1s, opacity 0.2s;
+    }
+
+    .btn-primary {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: #747d8c;
+        color: white;
+    }
+
+    .btn:active {
+        transform: scale(0.98);
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+    }
+
+    .no-results {
+        padding: 3rem;
+        color: #747d8c;
+    }
+
+    .pagination-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #dfe4ea;
+    }
+
+    .page-info {
+        font-weight: 600;
+        color: var(--secondary);
+    }
 
     .table-container {
         overflow-x: auto;
@@ -141,18 +311,108 @@
 
 @code {
     private List<Pizza>? pizzas;
+    private List<Pizza> filteredPizzas = new();
+    private string searchTerm = "";
+    private string PageName = "Welcome to our Pizza Order Page";
+
+    private string newPizzaName = "";
+    private bool isGlutenFree;
+    private bool isAdding;
+    private string statusMessage = "";
+
+    // Pagination
+    private int CurrentPage { get; set; } = 1;
+    private int PageSize { get; set; } = 5;
+    private int TotalPages => (int)Math.Ceiling((double)filteredPizzas.Count / PageSize);
+
+    private IEnumerable<Pizza> PaginatedPizzas => filteredPizzas
+        .Skip((CurrentPage - 1) * PageSize)
+        .Take(PageSize);
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadPizzas();
+    }
+
+    private async Task LoadPizzas()
+    {
         try
         {
-            // Fetch from the root-relative /pizzas endpoint
             pizzas = await Http.GetFromJsonAsync<List<Pizza>>($"{Navigation.BaseUri}pizzas");
+            HandleSearch(); // Refresh the filtered list
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching pizzas: {ex.Message}");
-            pizzas = new List<Pizza>(); // Fallback to empty list
+            pizzas = new List<Pizza>();
+            filteredPizzas = new();
         }
+    }
+
+    private void HandleSearch()
+    {
+        if (pizzas == null) return;
+
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            filteredPizzas = pizzas.ToList();
+        }
+        else
+        {
+            filteredPizzas = pizzas
+                .Where(p => p.Name != null && p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+        CurrentPage = 1; // Reset to first page on search
+    }
+
+    private void NextPage()
+    {
+        if (CurrentPage < TotalPages) CurrentPage++;
+    }
+
+    private void PreviousPage()
+    {
+        if (CurrentPage > 1) CurrentPage--;
+    }
+
+    private async Task AddPizza()
+    {
+        if (string.IsNullOrWhiteSpace(newPizzaName)) return;
+
+        isAdding = true;
+        statusMessage = "";
+
+        try
+        {
+            var newPizza = new Pizza { Name = newPizzaName, IsGlutenFree = isGlutenFree };
+            var response = await Http.PostAsJsonAsync($"{Navigation.BaseUri}pizzas", newPizza);
+
+            if (response.IsSuccessStatusCode)
+            {
+                statusMessage = "Pizza added successfully! 🍕";
+                newPizzaName = "";
+                isGlutenFree = false;
+                await LoadPizzas();
+            }
+            else
+            {
+                statusMessage = $"Error: {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isAdding = false;
+        }
+    }
+
+    private void ResetSearch()
+    {
+        searchTerm = "";
+        filteredPizzas = pizzas ?? new();
     }
 }

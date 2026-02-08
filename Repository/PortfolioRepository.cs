@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using webapi.Commons;
 using webapi.Contracts;
 using webapi.Data;
 using webapi.Models;
@@ -12,26 +13,29 @@ public class PortfolioRepository:IPortfolioRepository
         _context = context;
     }
 
-    public async Task<Portfolio> CreateAsync(Portfolio portfolio)
+    public async Task<Result<Portfolio>> CreateAsync(Portfolio portfolio, CancellationToken ct = default)
     {
-        await _context.Portfolios.AddAsync(portfolio);
-        await _context.SaveChangesAsync();
-        return portfolio;
+        await _context.Portfolios.AddAsync(portfolio, ct);
+        await _context.SaveChangesAsync(ct);
+        return Result<Portfolio>.Success(portfolio);
     }
 
-    public async Task<Portfolio> DeletePortfolio(AppUser appUser, string symbol)
+    public async Task<Result<Portfolio>> DeletePortfolio(AppUser appUser, string symbol, CancellationToken ct = default)
     {
-        var portfolioModel = await _context.Portfolios.FirstOrDefaultAsync(x => x.AppUserId == appUser.Id && x.Stock.Symbol.ToLower() == symbol.ToLower());
-        if (portfolioModel == null) return null;
+        var portfolioModel = await _context.Portfolios.FirstOrDefaultAsync(x => x.AppUserId == appUser.Id && x.Stock.Symbol.ToLower() == symbol.ToLower(), ct);
+        if (portfolioModel == null) return Result<Portfolio>.Failure("Portfolio entry not found.");
 
         _context.Portfolios.Remove(portfolioModel);
-        await _context.SaveChangesAsync();
-        return portfolioModel;
+        await _context.SaveChangesAsync(ct);
+        return Result<Portfolio>.Success(portfolioModel);
     }
 
-    public async Task<List<Stock>> GetUserPortfolio(AppUser user)
+    public async Task<Result<List<Stock>>> GetUserPortfolio(AppUser user, CancellationToken ct = default)
     {
-        return await _context.Portfolios.Where(u => u.AppUserId == user.Id).Select(stock => new Stock
+        var result = await _context.Portfolios
+            .AsNoTracking()
+            .Where(u => u.AppUserId == user.Id)
+            .Select(stock => new Stock
             {
                 Id = stock.StockId,
                 Symbol = stock.Stock.Symbol,
@@ -40,6 +44,8 @@ public class PortfolioRepository:IPortfolioRepository
                 LastDiv = stock.Stock.LastDiv,
                 Industry = stock.Stock.Industry,
                 MarketCap = stock.Stock.MarketCap
-            }).ToListAsync();
+            }).ToListAsync(ct);
+            
+        return Result<List<Stock>>.Success(result);
     }
 }

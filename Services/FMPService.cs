@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Net.Http.Json;
 using webapi.Contracts;
 using webapi.Dtos.Stock;
 using webapi.Mapper;
@@ -6,30 +6,28 @@ using webapi.Models;
 
 namespace webapi.Services;
 
-public class FMPService:IFMPService
+public class FMPService : IFMPService
 {
-    private HttpClient _httpClient;
-    private IConfiguration _config;
+    private readonly HttpClient _httpClient;
+    private readonly IConfiguration _config;
+    
     public FMPService(HttpClient httpClient, IConfiguration config)
     {
         _httpClient = httpClient;
         _config = config;
     }
-    public async Task<Stock> FindStockBySymbolAsync(string symbol)
+
+    public async Task<Stock?> FindStockBySymbolAsync(string symbol)
     {
         try
         {
-            var result = await _httpClient.GetAsync($"https://financialmodelingprep.com/api/v3/profile/{symbol}?apikey={_config["FMPKey"]}");
-            if (result.IsSuccessStatusCode)
+            var apiKey = _config["FMPKey"];
+            var response = await _httpClient.GetFromJsonAsync<FMPStockDto[]>($"https://financialmodelingprep.com/api/v3/profile/{symbol}?apikey={apiKey}");
+            
+            if (response != null && response.Length > 0)
             {
-                var content = await result.Content.ReadAsStringAsync();
-                var tasks = JsonConvert.DeserializeObject<FMPStockDto[]>(content);
-                var stock = tasks[0];
-                if (stock != null)
-                {
-                    return stock.ToStockFromFMP();
-                }
-                return null;
+                var stock = response[0];
+                return stock.ToStockFromFMP();
             }
             return null;
         }
@@ -39,5 +37,4 @@ public class FMPService:IFMPService
             return null;
         }
     }
-
 }

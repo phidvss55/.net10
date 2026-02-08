@@ -2,15 +2,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace webapi.Dtos.Comment;
 
-public class UpdateCommentRequest
-{
+public record UpdateCommentRequest(
     [Required]
     [MinLength(5, ErrorMessage = "Title must be 5 characters")]
     [MaxLength(280, ErrorMessage = "Title cannot be over 280 characters")]
-    public string Title { get; set; } = string.Empty;
+    string Title,
     
     [Required]
     [MinLength(5, ErrorMessage = "Content must be 5 characters")]
     [MaxLength(280, ErrorMessage = "Content cannot be over 280 characters")]
-    public string Content { get; set; } = string.Empty;
-}
+    string Content
+);

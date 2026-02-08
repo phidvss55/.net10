@@ -7,15 +7,13 @@ namespace webapi.Mapper
     {
         public static CommentDto ToCommentDto(this Comment commentModel)
         {
-            return new CommentDto
-            {
-                Id = commentModel.Id,
-                Title = commentModel.Title,
-                Content = commentModel.Content,
-                CreatedOn = commentModel.CreatedAt,
-                // CreatedBy = commentModel.AppUser.UserName,
-                StockId = commentModel.StockId
-            };
+            return new CommentDto(
+                commentModel.Id,
+                commentModel.Title,
+                commentModel.Content,
+                commentModel.CreatedAt,
+                commentModel.StockId
+            );
         }
 
         public static Comment ToCommentFromCreate(this CreateCommentRequest commentDto, int stockId)

@@ -16,31 +16,33 @@ public class StockRepository : IStockRepository
         _context = context;
     }
 
-    public async Task<Stock> CreateAsync(Stock stockModel)
+    public async Task<Result<Stock>> CreateAsync(Stock stockModel, CancellationToken ct = default)
     {
-        await _context.Stocks.AddAsync(stockModel);
-        await _context.SaveChangesAsync();
-        return stockModel;
+        await _context.Stocks.AddAsync(stockModel, ct);
+        await _context.SaveChangesAsync(ct);
+        return Result<Stock>.Success(stockModel);
     }
 
-    public async Task<Stock?> DeleteAsync(int id)
+    public async Task<Result<Stock>> DeleteAsync(int id, CancellationToken ct = default)
     {
-        var stockModel = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
+        var stockModel = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id, ct);
 
         if (stockModel == null)
         {
-            return null;
+            return Result<Stock>.Failure("Stock not found.");
         }
 
         _context.Stocks.Remove(stockModel);
-        await _context.SaveChangesAsync();
-        return stockModel;
+        await _context.SaveChangesAsync(ct);
+        return Result<Stock>.Success(stockModel);
     }
 
-    public async Task<List<Stock>> GetAllAsync(QueryObject query)
+    public async Task<Result<List<Stock>>> GetAllAsync(QueryObject query, CancellationToken ct = default)
     {
-        var stocks = _context.Stocks.Include(c => c.Comments).AsQueryable();
-        // return await _context.Stocks.Include(c => c.Comments).ToListAsync();
+        var stocks = _context.Stocks
+            .Include(c => c.Comments)
+            .AsNoTracking()
+            .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(query.CompanyName)) 
         {
@@ -61,42 +63,55 @@ public class StockRepository : IStockRepository
         }
 
         var skipNumber = (query.PageNumber - 1) * query.PageSize;
-        return await stocks.Skip(skipNumber).Take(query.PageSize).ToListAsync();
+        var result = await stocks.Skip(skipNumber).Take(query.PageSize).ToListAsync(ct);
+        return Result<List<Stock>>.Success(result);
     }
 
-    public async Task<Stock?> GetByIdAsync(int id)
+    public async Task<Result<Stock>> GetByIdAsync(int id, CancellationToken ct = default)
     {
-        return await _context.Stocks.Include(c => c.Comments).FirstOrDefaultAsync(i => i.Id == id);
+        var stock = await _context.Stocks
+            .Include(c => c.Comments)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(i => i.Id == id, ct);
+
+        return stock == null 
+            ? Result<Stock>.Failure("Stock not found.") 
+            : Result<Stock>.Success(stock);
     }
 
-    public async Task<Stock?> GetBySymbolAsync(string symbol)
+    public async Task<Result<Stock>> GetBySymbolAsync(string symbol, CancellationToken ct = default)
     {
-        return await _context.Stocks.FirstOrDefaultAsync(s => s.Symbol == symbol);
+        var stock = await _context.Stocks
+            .AsNoTracking()
+            .FirstOrDefaultAsync(s => s.Symbol == symbol, ct);
+
+        return stock == null 
+            ? Result<Stock>.Failure("Stock not found.") 
+            : Result<Stock>.Success(stock);
     }
 
-    public Task<bool> StockExists(int id)
+    public Task<bool> StockExists(int id, CancellationToken ct = default)
     {
-        return _context.Stocks.AnyAsync(s => s.Id == id);
+        return _context.Stocks.AnyAsync(s => s.Id == id, ct);
     }
 
-    public async Task<Stock?> UpdateAsync(int id, UpdateStockRequest stockDto)
+    public async Task<Result<Stock>> UpdateAsync(int id, UpdateStockRequest stockDto, CancellationToken ct = default)
     {
-        var existingStock = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
+        var existingStock = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id, ct);
 
         if (existingStock == null)
         {
-            return null;
+            return Result<Stock>.Failure("Stock not found.");
         }
 
         existingStock.Symbol = stockDto.Symbol;
         existingStock.CompanyName = stockDto.CompanyName;
-        // existingStock.Purchase = stockDto.Purchase;
         existingStock.LastDiv = stockDto.LastDiv;
         existingStock.Industry = stockDto.Industry;
         existingStock.MarketCap = stockDto.MarketCap;
 
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(ct);
 
-        return existingStock;
+        return Result<Stock>.Success(existingStock);
     }
 }

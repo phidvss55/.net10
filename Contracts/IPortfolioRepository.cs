@@ -1,10 +1,11 @@
+using webapi.Commons;
 using webapi.Models;
 
 namespace webapi.Contracts;
 
 public interface IPortfolioRepository
 {
-    Task<List<Stock>> GetUserPortfolio(AppUser user);
-    Task<Portfolio> CreateAsync(Portfolio portfolio);
-    Task<Portfolio> DeletePortfolio(AppUser appUser, string symbol);
+    Task<Result<List<Stock>>> GetUserPortfolio(AppUser user, CancellationToken ct = default);
+    Task<Result<Portfolio>> CreateAsync(Portfolio portfolio, CancellationToken ct = default);
+    Task<Result<Portfolio>> DeletePortfolio(AppUser appUser, string symbol, CancellationToken ct = default);
 }

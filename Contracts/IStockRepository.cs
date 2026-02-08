@@ -6,11 +6,11 @@ namespace webapi.Contracts;
 
 public interface IStockRepository
 {
-    Task<List<Stock>> GetAllAsync(QueryObject query);
-    Task<Stock?> GetByIdAsync(int id);
-    Task<Stock?> GetBySymbolAsync(string symbol);
-    Task<Stock> CreateAsync(Stock stockModel);
-    Task<Stock?> UpdateAsync(int id, UpdateStockRequest stockDto);
-    Task<Stock?> DeleteAsync(int id);
-    Task<bool> StockExists(int id);
+    Task<Result<List<Stock>>> GetAllAsync(QueryObject query, CancellationToken ct = default);
+    Task<Result<Stock>> GetByIdAsync(int id, CancellationToken ct = default);
+    Task<Result<Stock>> GetBySymbolAsync(string symbol, CancellationToken ct = default);
+    Task<Result<Stock>> CreateAsync(Stock stockModel, CancellationToken ct = default);
+    Task<Result<Stock>> UpdateAsync(int id, UpdateStockRequest stockDto, CancellationToken ct = default);
+    Task<Result<Stock>> DeleteAsync(int id, CancellationToken ct = default);
+    Task<bool> StockExists(int id, CancellationToken ct = default);
 }
