@@ -15,11 +15,11 @@ Content-Type: application/json
 {
   "id": 1,
   "Symbol": "UTH",
-  "CompanyName": "UTH Limited" ,
+  "CompanyName": "UTH Limit" ,
   "Price": 12.53,
   "LastDiv":  0.5,
   "Industry": "IT",
-  "MarketCap":  0
+  "MarketCap":  12
 }
 
 ###

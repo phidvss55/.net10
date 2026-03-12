@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace webapi.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class SampleApiController : ControllerBase
     {
         [HttpGet("hello")]

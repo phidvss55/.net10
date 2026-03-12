@@ -15,6 +15,7 @@ public class ApplicationDBContext: IdentityDbContext<AppUser>
     public DbSet<Portfolio> Portfolios { get; set; }
     public DbSet<Game> Games => Set<Game>();
     public DbSet<Genre> Genres => Set<Genre>();
+    public DbSet<Books> Books => Set<Books>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

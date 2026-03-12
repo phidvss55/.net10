@@ -1,0 +1,37 @@
+@page "/game"
+@model webapi.Components.Pages.GamePageModel
+@{
+    ViewData["Title"] = "Game content page";
+    Layout = "_Layout";
+}
+
+<h1>Game list</h1>
+<hr>
+<a href="" class="btn btn-success">Create</a>
+
+<table class="table table-responsive table-striped table-hover align-middle">
+    <thead>
+        <tr class="text-center">
+            <th scope="col">@Html.DisplayNameFor(model => model.Games[0].Id)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.Games[0].Name)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.Games[0].Genre)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.Games[0].ReleaseDate)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var game in Model.Games)
+        {
+            <tr class="text-center">
+                <td>@Html.DisplayFor(model => game.Id)</td>
+                <td>@Html.DisplayFor(model => game.Name)</td>
+                <td>@Html.DisplayFor(model => game.Genre)</td>
+                <td>@game.ReleaseDate.ToShortDateString()</td>
+                <td>
+                    <a href="" class="btn btn-primary">Edit</a>
+                    <a href="" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

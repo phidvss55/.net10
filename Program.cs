@@ -12,7 +12,6 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddEndpointsApiExplorer();
-// builder.Services.AddOpenApi();
 
 // Custom Service Registrations
 builder.Services.AddApplicationServices(builder.Configuration);
@@ -21,16 +20,17 @@ builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddSwaggerServices();
 
 // Razor Pages and Components
-builder.Services.AddRazorPages();
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+builder.Services.AddRazorPages(options =>
+{
+    options.RootDirectory = "/Components/Pages";
+});
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    // app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
@@ -50,12 +50,19 @@ app.UseMiddleware<LoggerMiddleware>();
 
 // Route Mapping
 app.MapRazorPages();
-app.MapRazorComponents<webapi.Components.App>()
-    .AddInteractiveServerRenderMode();
+app.MapRazorComponents<webapi.Components.App>().AddInteractiveServerRenderMode();
 
 app.MapControllers();
 app.MapGameRoutes();
 
-string hostUrl = builder.Configuration["AppSettings:HostUrl"] ?? "http://localhost:8080";
-app.Run(hostUrl);
+var hostUrl = builder.Configuration["AppSettings:HostUrl"];
+
+if (string.IsNullOrWhiteSpace(hostUrl))
+{
+    await app.RunAsync();
+}
+else
+{
+    await app.RunAsync(hostUrl);
+}
 

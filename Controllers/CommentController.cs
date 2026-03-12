@@ -11,7 +11,6 @@ namespace webapi.Controllers;
 
 [ApiController]
 [Route("/comments")]
-[Authorize]
 public class CommentController: BaseApiController
 {
     private readonly ICommentRepository _commentRepository;
@@ -49,7 +48,7 @@ public class CommentController: BaseApiController
         return Ok(result.Value.ToCommentDto());
     }
     
-    [HttpPost("{stockId:alpha}")]
+    [HttpPost("{stockId:int}")]
     public  async Task<IActionResult> CreateComment([FromRoute] int stockId, [FromBody] CreateCommentRequest commentRequest, CancellationToken ct)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);

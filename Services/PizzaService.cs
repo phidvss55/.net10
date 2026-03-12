@@ -14,7 +14,7 @@ public class PizzaService : IPizzaService
     public List<Pizza> GetAll() => Pizzas;
     public Pizza? Get(int id) => Pizzas.FirstOrDefault(p => p.Id == id);
     
-    public void Add(Pizza pizza) 
+    public void Add(Pizza pizza)
     {
         pizza.Id = Pizzas.Count + 1;
         Pizzas.Add(pizza);
