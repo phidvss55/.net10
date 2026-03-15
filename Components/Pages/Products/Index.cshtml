@@ -1,0 +1,50 @@
+@model IEnumerable<webapi.Models.Views.ProductViewModel>
+
+@{
+    ViewData["Title"] = "Product content page";
+    Layout = "../_Layout";
+}
+
+<h1>Product list</h1>
+<hr>
+<a href="/product/create" class="btn btn-success">Create</a>
+
+<table class="table table-responsive table-striped table-hover align-middle">
+    <thead>
+    <tr class="text-center">
+        <th scope="col">@Html.DisplayNameFor(model => model.Id)</th>
+        <th scope="col">@Html.DisplayNameFor(model => model.Name)</th>
+        <th scope="col">@Html.DisplayNameFor(model => model.Price)</th>
+        <th scope="col">@Html.DisplayNameFor(model => model.Qty)</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var product in Model)
+        {
+            <tr class="text-center">
+                <td>@Html.DisplayFor(model => product.Id)</td>
+                <td>@Html.DisplayFor(model => product.Name)</td>
+                <td>@Html.DisplayFor(model => product.Price)</td>
+                <td>@Html.DisplayFor(model => product.Qty)</td>
+                <td>
+                    <a href="/product/edit?id=@product.Id" class="btn btn-primary">Edit</a>
+    
+                      <form method="post" action="/product/delete?id=@product.Id"
+                          onsubmit="return confirm('Are you sure you want to delete this product?');"
+                          style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    } else {
+        <tr>
+            <td colspan="5" class="text-center">No products available.</td>
+        </tr>
+    }
+    </tbody>
+</table>

@@ -13,7 +13,8 @@
     - [project name].Tests.csproj - Test project file
     - UnitTests.cs - Unit tests file
 
---- 
+---
+
 ### Run project
 
 ```bash
@@ -21,14 +22,33 @@ dotnet restore
 dotnet build
 dotnet run
 ```
+
 ---
+
 ### Commands
 
 Run generate migrations
+
 ```bash
   dotnet ef migrations add init
 ```
+
 Execute migration files into database
+
 ```bash
   dotnet ef database update
 ```
+
+---
+
+### Flow
+
+There are two flow inside
+
+1. API
+
+- including `BaseApiController` and `ApiConventionController`
+
+2. View
+
+- All include inside `View` directory

@@ -15,10 +15,23 @@ public class IndexModel : PageModel
         _context = context;
     }
     
-    public IList<webapi.Models.Books> Books { get; set; } = default!;
+    public IList<webapi.Models.Books> Books { get; set; } = [];
     
     public async Task OnGetAsync()
     {
         Books = await _context.Books.ToListAsync();
+    }
+
+    public async Task<IActionResult> OnPostDeleteAsync(int id)
+    {
+        var book = await _context.Books.FindAsync(id);
+
+        if (book is not null)
+        {
+            _context.Books.Remove(book);
+            await _context.SaveChangesAsync();
+        }
+
+        return Redirect("/book");
     }
 }

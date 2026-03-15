@@ -9,8 +9,7 @@ using webapi.Models;
 
 namespace webapi.Controllers;
 
-[ApiController]
-[Route("/comments")]
+[Route("[controller]")] 
 public class CommentController: BaseApiController
 {
     private readonly ICommentRepository _commentRepository;

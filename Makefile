@@ -8,3 +8,9 @@ build:
 	
 watch:
 	dotnet watch --project webapi.csproj run
+	
+migrate-gen:
+	dotnet ef migrations add init
+    
+migrate-up:
+	dotnet ef database update

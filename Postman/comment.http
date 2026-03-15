@@ -1,4 +1,4 @@
-@API_HOST = http://localhost:8080/comments
+@API_HOST = http://localhost:8080/api/comment
 
 ### Get all stocks
 GET {{API_HOST}}/ HTTP/1.1

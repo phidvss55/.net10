@@ -1,40 +1,40 @@
-@page "/book"
-@model webapi.Components.Pages.Books.IndexModel
+@page "/product"
+@model IEnumerable<webapi.Models.Views.ProductViewModel>
 
 @{
-    ViewData["Title"] = "Books content page";
+    ViewData["Title"] = "Product content page";
     Layout = "../_Layout";
 }
 
-<h1>Books list</h1>
+<h1>Product list</h1>
 <hr>
 <a href="/book/create" class="btn btn-success">Create</a>
 
 <table class="table table-responsive table-striped table-hover align-middle">
     <thead>
     <tr class="text-center">
-        <th scope="col">@Html.DisplayNameFor(model => model.Books[0].Id)</th>
-        <th scope="col">@Html.DisplayNameFor(model => model.Books[0].BookTitle)</th>
-        <th scope="col">@Html.DisplayNameFor(model => model.Books[0].AuthorName)</th>
-        <th scope="col">@Html.DisplayNameFor(model => model.Books[0].BookDescription)</th>
+        <th scope="col">@Html.DisplayNameFor(model => model.Id)</th>
+        <th scope="col">@Html.DisplayNameFor(model => model.Name)</th>
+        <th scope="col">@Html.DisplayNameFor(model => model.Price)</th>
+        <th scope="col">@Html.DisplayNameFor(model => model.Qty)</th>
         <th>Actions</th>
     </tr>
     </thead>
     <tbody>
-    @if (Model.Books != null && Model.Books.Any()) 
+    @if (Model.Count() > 0 && Model.Any())
     {
-        @foreach (var book in Model.Books)
+        @foreach (var book in Model)
         {
             <tr class="text-center">
                 <td>@Html.DisplayFor(model => book.Id)</td>
-                <td>@Html.DisplayFor(model => book.BookTitle)</td>
-                <td>@Html.DisplayFor(model => book.AuthorName)</td>
-                <td>@Html.DisplayFor(model => book.BookDescription)</td>
+                <td>@Html.DisplayFor(model => book.Name)</td>
+                <td>@Html.DisplayFor(model => book.Price)</td>
+                <td>@Html.DisplayFor(model => book.Qty)</td>
                 <td>
                     <a href="/book/edit?id=@book.Id" class="btn btn-primary">Edit</a>
-
+    
                     @* <form method="post" asp-page-handler="Delete" asp-route-id="@book.Id" *@
-                     <form method="post" action="/book?handler=Delete&id=@book.Id"
+                    <form method="post" action="/book?handler=Delete&id=@book.Id"
                           onsubmit="return confirm('Are you sure you want to delete this book?');"
                           style="display:inline;">
                         @Html.AntiForgeryToken()

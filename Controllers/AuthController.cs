@@ -8,8 +8,7 @@ using RegisterRequest = webapi.Dtos.Auth.RegisterRequest;
 
 namespace webapi.Controllers;
 
-[Route("/auth")]
-[ApiController]
+[Route("[controller]")]
 public class AuthController : BaseApiController
 {
     private readonly UserManager<AppUser> _userManager;

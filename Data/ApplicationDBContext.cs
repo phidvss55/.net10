@@ -16,6 +16,7 @@ public class ApplicationDBContext: IdentityDbContext<AppUser>
     public DbSet<Game> Games => Set<Game>();
     public DbSet<Genre> Genres => Set<Genre>();
     public DbSet<Books> Books => Set<Books>();
+    public DbSet<Product> Products => Set<Product>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -5,8 +5,7 @@ using webapi.Models;
 
 namespace webapi.Controllers;
 
-[ApiController]
-[Route("/pizzas")]
+[Route("[controller]")]
 [Authorize]
 public class PizzaController : BaseApiController
 {

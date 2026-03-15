@@ -14,7 +14,7 @@ public class EditModel : PageModel
         _context = context;
     }
 
-    // [BindProperty]
+    [BindProperty]
     public webapi.Models.Books Books { get; set; } = default;
     
     public async Task<IActionResult> OnGetAsync(int? id)
@@ -37,6 +37,7 @@ public class EditModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        Console.WriteLine("Attempting to update book with ID: " + Books.Id);
         if (!ModelState.IsValid)
         {
             return Page();
@@ -52,7 +53,6 @@ public class EditModel : PageModel
         {
             Console.WriteLine("Concurrency error occurred while updating the book." + $"Book ID: {Books.Id}");
         }
-        
-        return RedirectToPage("/Index");
+        return RedirectToPage("./Index");
     }
 }

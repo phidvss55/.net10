@@ -1,3 +1,4 @@
+using webapi;
 using webapi.Extensions;
 using webapi.Middleware;
 using webapi.Routes;
@@ -5,7 +6,10 @@ using webapi.Routes;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers()
+builder.Services.AddControllersWithViews(options =>
+    {
+        options.Conventions.Add(new ApiPrefixConvention());
+    })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
@@ -18,6 +22,11 @@ builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddSwaggerServices();
+builder.Services.AddRouting(options =>
+{
+    options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = true;
+});
 
 // Razor Pages and Components
 builder.Services.AddRazorPages(options =>
@@ -52,6 +61,7 @@ app.UseMiddleware<LoggerMiddleware>();
 app.MapRazorPages();
 app.MapRazorComponents<webapi.Components.App>().AddInteractiveServerRenderMode();
 
+// api controller mapping
 app.MapControllers();
 app.MapGameRoutes();
 
