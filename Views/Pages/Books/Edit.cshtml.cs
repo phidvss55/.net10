@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using webapi.Data;
 
-namespace webapi.Components.Pages.Books;
+namespace webapi.Views.Pages.Books;
 
 public class EditModel : PageModel
 {

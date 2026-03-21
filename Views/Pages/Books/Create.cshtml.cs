@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using webapi.Data;
 using webapi.Models;
 
-namespace webapi.Components.Pages.Books;
+namespace webapi.Views.Pages.Books;
 
 public class CreateModel : PageModel
 {

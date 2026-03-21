@@ -1,8 +1,10 @@
-@API_HOST = http://localhost:8080/pizzas
+@API_HOST = http://localhost:8080/api/pizza
+@TOKEN = eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBoaUBnbWFpbC5jb20iLCJnaXZlbl9uYW1lIjoidGVzdHVzZXIiLCJuYmYiOjE3NzQwMjg0NzAsImV4cCI6MTc3NDAzMjA3MCwiaWF0IjoxNzc0MDI4NDcwLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwODAifQ.ZRpL7gru26RU7eHvjM8O-iopVPSOOZIILV1RRS1p6Jj3B0Rffk2-z-hNB5TO3tktWkbLKNTDS55xSkMYhDoiuw
 
 ### Get alls
 GET {{API_HOST}}/ HTTP/1.1
 Accept: application/json
+Authentication: Bearer {{TOKEN}}
 
 ###
 GET {{API_HOST}}/1 HTTP/1.1

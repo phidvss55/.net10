@@ -7,8 +7,7 @@ using webapi.Models;
 
 namespace webapi.Controllers;
 
-[ApiController]
-[Route("/portfolios")]
+[Route("[controller]")]
 [Authorize]
 public class PortfolioController:BaseApiController
 {

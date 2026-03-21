@@ -14,8 +14,15 @@ public class TokenService:ITokenService
 {
     private readonly JwtOptions _jwtOptions;
     private readonly SymmetricSecurityKey _key;
+    private readonly IConfiguration _configuration;
     
     public TokenService(IOptions<JwtOptions> jwtOptions) {
+        _jwtOptions = jwtOptions.Value;
+        _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey));
+    }
+    
+    public TokenService(IConfiguration configuration, IOptions<JwtOptions> jwtOptions) {
+        _configuration = configuration;
         _jwtOptions = jwtOptions.Value;
         _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey));
     }

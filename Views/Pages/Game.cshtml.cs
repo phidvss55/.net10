@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using webapi.Data;
 using webapi.Models;
 
-namespace webapi.Components.Pages;
+namespace webapi.Views.Pages;
 
 public class GamePageModel : PageModel
 {

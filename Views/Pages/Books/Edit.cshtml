@@ -1,15 +1,15 @@
-@page "/book/create"
-@model webapi.Components.Pages.Books.CreateModel
+@page "/book/edit"
+@model webapi.Views.Pages.Books.EditModel
 
 @{
-    ViewData["Title"] = "Create Book";
+    ViewData["Title"] = "Edit Book";
     Layout = "../_Layout";
 }
 
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-6 offset-md-3">
-            <h1>Create New Book</h1>
+            <h1>Edit book: @Model.Books.BookTitle</h1>
             <hr>
             
             @if (!ViewData.ModelState.IsValid)
@@ -19,7 +19,7 @@
                     <ul>
                         @foreach (var modelState in ViewData.ModelState.Values)
                         {
-                            @foreach (var error in modelState.Errors)
+                            @foreach (var error in modelState.Errors) 
                             {
                                 <li>@error.ErrorMessage</li>
                             }
@@ -33,23 +33,23 @@
                 
                 <div class="mb-3">
                     <label for="bookTitle" class="form-label">Book Title *</label>
-                    <input type="text" class="form-control" id="bookTitle" name="bookTitle" required>
+                    <input type="text" class="form-control" id="bookTitle" name="bookTitle" required value="@Model.Books.BookTitle">
                     <small class="text-muted">Required field</small>
                 </div>
                 
                 <div class="mb-3">
                     <label for="authorName" class="form-label">Author Name *</label>
-                    <input type="text" class="form-control" id="authorName" name="authorName" required>
+                    <input type="text" class="form-control" id="authorName" name="authorName" required value="@Model.Books.AuthorName">
                     <small class="text-muted">Required field</small>
                 </div>
                 
                 <div class="mb-3">
                     <label for="bookDescription" class="form-label">Description</label>
-                    <textarea class="form-control" id="bookDescription" name="bookDescription" rows="4"></textarea>
+                    <textarea class="form-control" id="bookDescription" name="bookDescription" rows="4">@Model.Books.BookDescription</textarea>
                 </div>
                 
                 <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-success">Create</button>
+                    <button type="submit" class="btn btn-primary">Edit</button>
                     <a href="/book" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>

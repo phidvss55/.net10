@@ -28,10 +28,10 @@ builder.Services.AddRouting(options =>
     options.LowercaseQueryStrings = true;
 });
 
-// Razor Pages and Components
+// Razor Pages and Views
 builder.Services.AddRazorPages(options =>
 {
-    options.RootDirectory = "/Components/Pages";
+    options.RootDirectory = "/Views/Pages";
 });
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
@@ -59,7 +59,7 @@ app.UseMiddleware<LoggerMiddleware>();
 
 // Route Mapping
 app.MapRazorPages();
-app.MapRazorComponents<webapi.Components.App>().AddInteractiveServerRenderMode();
+app.MapRazorComponents<webapi.Views.App>().AddInteractiveServerRenderMode();
 
 // api controller mapping
 app.MapControllers();

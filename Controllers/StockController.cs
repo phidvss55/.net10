@@ -8,8 +8,7 @@ using webapi.Mapper;
 
 namespace webapi.Controllers;
 
-[ApiController]
-[Route("/stocks")]
+[Route("[controller]")]
 public class StockController : BaseApiController
 {
     private readonly IStockRepository _stockRepository;

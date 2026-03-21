@@ -17,7 +17,6 @@ public class PizzaController : BaseApiController
     }
 
     [HttpGet(Name = "GetAllPizzas")]
-    [AllowAnonymous]
     public IActionResult GetAll()
     {
         return Ok(_pizzaService.GetAll());
