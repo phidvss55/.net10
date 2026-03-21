@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using webapi.Models;
@@ -20,16 +21,46 @@ namespace webapi.Controllers.Views
             this.roleManager = roleManager;
         }
 
+        private IActionResult? RedirectAuthenticatedUser()
+        {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return Redirect("~/");
+            }
+
+            return null;
+        }
+
+        private async Task<IActionResult> SignOutAndRedirectAsync()
+        {
+            await signInManager.SignOutAsync();
+            return Redirect("~/");
+        }
+
+        [AllowAnonymous]
         [HttpGet("login")]
         public IActionResult Login()
         {
+            var redirectResult = RedirectAuthenticatedUser();
+            if (redirectResult != null)
+            {
+                return redirectResult;
+            }
+
             return View("~/Views/Pages/Account/Login.cshtml");
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
+            var redirectResult = RedirectAuthenticatedUser();
+            if (redirectResult != null)
+            {
+                return redirectResult;
+            }
+
             if (!ModelState.IsValid)
             {
                 return View("~/Views/Pages/Account/Login.cshtml", model);
@@ -47,16 +78,30 @@ namespace webapi.Controllers.Views
             return View("~/Views/Pages/Account/Login.cshtml", model);
         }
 
+        [AllowAnonymous]
         [HttpGet("register")]
         public IActionResult Register()
         {
+            var redirectResult = RedirectAuthenticatedUser();
+            if (redirectResult != null)
+            {
+                return redirectResult;
+            }
+
             return View("~/Views/Pages/Account/Register.cshtml");
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+            var redirectResult = RedirectAuthenticatedUser();
+            if (redirectResult != null)
+            {
+                return redirectResult;
+            }
+
             if (!ModelState.IsValid)
             {
                 return View("~/Views/Pages/Account/Register.cshtml", model);
@@ -86,7 +131,7 @@ namespace webapi.Controllers.Views
                 await userManager.AddToRoleAsync(user, "User");
 
                 await signInManager.SignInAsync(user, isPersistent: false);
-                return RedirectToAction("Login", "Account");
+                return Redirect("~/");
             }
 
             foreach (var error in result.Errors)
@@ -97,16 +142,30 @@ namespace webapi.Controllers.Views
             return View("~/Views/Pages/Account/Register.cshtml", model);
         }
 
+        [AllowAnonymous]
         [HttpGet("verify-email")]
         public IActionResult VerifyEmail()
         {
+            var redirectResult = RedirectAuthenticatedUser();
+            if (redirectResult != null)
+            {
+                return redirectResult;
+            }
+
             return View("~/Views/Pages/Account/VerifyEmail.cshtml");
         }
 
+        [AllowAnonymous]
         [HttpPost("verify-email")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> VerifyEmail(VerifyEmailViewModel model)
         {
+            var redirectResult = RedirectAuthenticatedUser();
+            if (redirectResult != null)
+            {
+                return redirectResult;
+            }
+
             if (!ModelState.IsValid)
             {
                 return View("~/Views/Pages/Account/VerifyEmail.cshtml", model);
@@ -125,9 +184,16 @@ namespace webapi.Controllers.Views
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("change-password")]
         public IActionResult ChangePassword(string username)
         {
+            var redirectResult = RedirectAuthenticatedUser();
+            if (redirectResult != null)
+            {
+                return redirectResult;
+            }
+
             if (string.IsNullOrEmpty(username))
             {
                 return RedirectToAction("VerifyEmail", "Account");
@@ -136,9 +202,16 @@ namespace webapi.Controllers.Views
             return View("~/Views/Pages/Account/ChangePassword.cshtml", new ChangePasswordViewModel { Email = username });
         }
 
+        [AllowAnonymous]
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
+            var redirectResult = RedirectAuthenticatedUser();
+            if (redirectResult != null)
+            {
+                return redirectResult;
+            }
+
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError("", "Something went wrong");
@@ -170,12 +243,19 @@ namespace webapi.Controllers.Views
             }
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [Authorize]
+        [HttpGet("logout")]
         public async Task<IActionResult> Logout()
         {
-            await signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            return await SignOutAndRedirectAsync();
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LogoutPost()
+        {
+            return await SignOutAndRedirectAsync();
         }
     }
 }

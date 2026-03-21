@@ -34,6 +34,7 @@ builder.Services.AddRazorPages(options =>
     options.RootDirectory = "/Views/Pages";
 });
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+builder.Services.AddCascadingAuthenticationState();
 
 var app = builder.Build();
 

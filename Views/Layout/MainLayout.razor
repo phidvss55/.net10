@@ -10,6 +10,20 @@
             <li><a href="/book">Books</a></li>
             <li><a href="/product">Product</a></li>
         </ul>
+        <AuthorizeView>
+            <Authorized>
+                <div class="auth-links">
+                    <span class="welcome-text">@context.User.Identity?.Name</span>
+                    <a href="/account/logout">Logout</a>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="auth-links">
+                    <a href="/account/login">Login</a>
+                    <a href="/account/register">Register</a>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
     </nav>
 </header>
 
@@ -44,6 +58,11 @@
         margin: 0;
         padding: 0;
     }
+    nav {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
     nav a {
         color: #ced4da;
         text-decoration: none;
@@ -51,6 +70,15 @@
     }
     nav a:hover {
         color: var(--primary);
+    }
+    .auth-links {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .welcome-text {
+        color: #ffffff;
+        font-size: 0.95rem;
     }
     main {
         flex: 1;
@@ -65,5 +93,21 @@
         text-align: center;
         padding: 1.5rem;
         margin-top: auto;
+    }
+    @@media (max-width: 768px) {
+        header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        nav {
+            width: 100%;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        nav ul {
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
     }
 </style>

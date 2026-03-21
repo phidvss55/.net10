@@ -34,7 +34,9 @@
 </head>
 
 <body>
-    <Routes @rendermode="RenderMode.InteractiveServer" />
+    <CascadingAuthenticationState>
+        <Routes @rendermode="RenderMode.InteractiveServer" />
+    </CascadingAuthenticationState>
     @* <script src="_framework/blazor.web.js"></script> *@
 </body>
 
