@@ -5,6 +5,7 @@ using webapi.Models.Views;
 
 namespace webapi.Controllers.Views
 {
+    [Route("home")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -14,27 +15,24 @@ namespace webapi.Controllers.Views
             _logger = logger;
         }
 
+        [HttpGet("")]
         public IActionResult Index()
         {
-            return View();
+            return View("~/Views/Pages/Home/Index.cshtml");
         }
 
         [Authorize]
+        [HttpGet("Privacy")]
         public IActionResult Privacy()
         {
-            return View();
+            return View("~/Views/Pages/Home/Privacy.cshtml");
         }
 
         [Authorize(Roles = "Admin")]
+        [HttpGet("Admin")]
         public IActionResult Admin()
         {
-            return View();
-        }
-
-        [Authorize(Roles = "User")]
-        public IActionResult User()
-        {
-            return View();
+            return View("~/Views/Pages/Home/Admin.cshtml");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

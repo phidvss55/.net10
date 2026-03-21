@@ -56,6 +56,7 @@ app.UseAuthorization();
 app.UseAntiforgery();
 
 app.UseMiddleware<LoggerMiddleware>();
+// app.UseMiddleware<AuthenticationMiddleware>("Test");
 
 // Route Mapping
 app.MapRazorPages();

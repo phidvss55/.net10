@@ -53,14 +53,22 @@ public static class ServiceCollectionExtensions
         })
         .AddEntityFrameworkStores<ApplicationDBContext>();
 
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.LoginPath = "/account/login";
+            options.AccessDeniedPath = "/account/login";
+            options.SlidingExpiration = true;
+        });
+
         services.AddAuthentication(options =>
         {
-            options.DefaultAuthenticateScheme = 
-            options.DefaultChallengeScheme = 
-            options.DefaultForbidScheme = 
-            options.DefaultScheme = 
-            options.DefaultSignInScheme = 
-            options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+            // Use Cookies as default for views; APIs can explicitly use JWT
+            options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+            options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+            options.DefaultForbidScheme = IdentityConstants.ApplicationScheme;
+            options.DefaultScheme = IdentityConstants.ApplicationScheme;
+            options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
+            options.DefaultSignOutScheme = IdentityConstants.ApplicationScheme;
         })
         .AddJwtBearer(options =>
         {

@@ -20,45 +20,46 @@ namespace webapi.Controllers.Views
             this.roleManager = roleManager;
         }
 
-        [HttpGet]
+        [HttpGet("login")]
         public IActionResult Login()
         {
-            return View();
+            return View("~/Views/Pages/Account/Login.cshtml");
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View("~/Views/Pages/Account/Login.cshtml", model);
             }
 
             var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-
             if (result.Succeeded)
             {
-                return RedirectToAction("Index", "Home");
+                // return View("~/Views/Pages/Index");
+                // return RedirectToAction("Index", "Home");
+                return Redirect("~/"); // rezor pages
             }
 
             ModelState.AddModelError(string.Empty, "Invalid Login Attempt.");
-            return View(model);
+            return View("~/Views/Pages/Account/Login.cshtml", model);
         }
 
-        [HttpGet]
+        [HttpGet("register")]
         public IActionResult Register()
         {
-            return View();
+            return View("~/Views/Pages/Account/Register.cshtml");
         }
 
-        [HttpPost]
+        [HttpPost("register")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View("~/Views/Pages/Account/Register.cshtml", model);
             }
 
             var user = new AppUser()
@@ -93,22 +94,22 @@ namespace webapi.Controllers.Views
                 ModelState.AddModelError(string.Empty, error.Description);
             }
 
-            return View(model);
+            return View("~/Views/Pages/Account/Register.cshtml", model);
         }
 
-        [HttpGet]
+        [HttpGet("verify-email")]
         public IActionResult VerifyEmail()
         {
-            return View();
+            return View("~/Views/Pages/Account/VerifyEmail.cshtml");
         }
 
-        [HttpPost]
+        [HttpPost("verify-email")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> VerifyEmail(VerifyEmailViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View("~/Views/Pages/Account/VerifyEmail.cshtml", model);
             }
 
             var user = await userManager.FindByNameAsync(model.Email);
@@ -116,7 +117,7 @@ namespace webapi.Controllers.Views
             if (user == null)
             {
                 ModelState.AddModelError("", "User not found!");
-                return View(model);
+                return View("~/Views/Pages/Account/VerifyEmail.cshtml", model);
             }
             else
             {
@@ -124,7 +125,7 @@ namespace webapi.Controllers.Views
             }
         }
 
-        [HttpGet]
+        [HttpGet("change-password")]
         public IActionResult ChangePassword(string username)
         {
             if (string.IsNullOrEmpty(username))
@@ -132,16 +133,16 @@ namespace webapi.Controllers.Views
                 return RedirectToAction("VerifyEmail", "Account");
             }
 
-            return View(new ChangePasswordViewModel { Email = username });
+            return View("~/Views/Pages/Account/ChangePassword.cshtml", new ChangePasswordViewModel { Email = username });
         }
 
-        [HttpPost]
+        [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError("", "Something went wrong");
-                return View(model);
+                return View("~/Views/Pages/Account/ChangePassword.cshtml", model);
             }
 
             var user = await userManager.FindByNameAsync(model.Email);
@@ -149,7 +150,7 @@ namespace webapi.Controllers.Views
             if(user == null)
             {
                 ModelState.AddModelError("", "User not found!");
-                return View(model);
+                return View("~/Views/Pages/Account/ChangePassword.cshtml", model);
             }
 
             var result = await userManager.RemovePasswordAsync(user);
@@ -165,7 +166,7 @@ namespace webapi.Controllers.Views
                     ModelState.AddModelError("", error.Description);
                 }
 
-                return View(model);
+                return View("~/Views/Pages/Account/ChangePassword.cshtml", model);
             }
         }
 

@@ -16,6 +16,7 @@ public class ProductController: Controller
         _client.BaseAddress = baseUri;
     }
 
+    // [Authorize]
     [HttpGet("")]
     public IActionResult Index()
     {
@@ -26,7 +27,7 @@ public class ProductController: Controller
             string data = response.Content.ReadAsStringAsync().Result;
             products = JsonConvert.DeserializeObject<List<ProductViewModel>>(data);
         }
-        return View("~/Components/Pages/Products/Index.cshtml", products);
+        return View("~/Views/Pages/Products/Index.cshtml", products);
     }
 
     [HttpGet("create")]

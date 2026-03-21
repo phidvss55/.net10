@@ -30,7 +30,8 @@ dotnet run
 Run generate migrations
 
 ```bash
-  dotnet ef migrations add init
+  dotnet ef migrations add [name-migration]
+  -> example: dotnet ef migrations add InitialCreate
 ```
 
 Execute migration files into database

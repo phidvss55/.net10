@@ -12,7 +12,7 @@ public class ChangePasswordViewModel
     [StringLength(40, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 40 characters")]
     [DataType(DataType.Password)]
     [Display(Name = "Password")]
-    [Compare("ConfirmPassword", ErrorMessage = "Passwords must match")]
+    [Compare("ConfirmNewPassword", ErrorMessage = "Passwords must match")]
     public string NewPassword { get; set; }
     
     [Required(ErrorMessage = "Confirm password is required")]
